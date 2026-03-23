@@ -6,10 +6,17 @@ um eine externe Datenbank-Infrastruktur für Demos zu vermeiden.
 from tinydb import TinyDB
 from datetime import datetime, timezone
 import os
+from pathlib import Path
 
-# Pfad zur JSON-Datei für das Audit-Log
-LOG_DB_PATH = os.path.join(os.path.dirname(__file__), "../logs/audit_logs.json")
-db = TinyDB(LOG_DB_PATH)
+# Absoluter Pfad berechnen
+BASE_DIR = Path(__file__).resolve().parent.parent.parent # Geht zu /backend
+LOG_DIR = BASE_DIR / "logs"
+LOG_FILE = LOG_DIR / "audit_logs.json"
+
+# Ordner erstellen, falls nicht vorhanden
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+db = TinyDB(str(LOG_FILE))
 
 async def log_action(action: str, details: dict):
     """
