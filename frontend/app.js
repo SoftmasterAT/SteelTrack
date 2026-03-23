@@ -70,7 +70,15 @@ async function performLogin() {
             location.reload();
         } else {
             const error = await response.json();
-            showToast("Fehler: " + (error.detail || "Login fehlgeschlagen!"), "error");
+            let message = "Login fehlgeschlagen!";
+            if (typeof error.detail === "string") {
+                message = error.detail;
+            } else if (Array.isArray(error.detail)) {
+                // Nimmt die erste Fehlermeldung aus der Liste (z.B. "name: field required")
+                message = error.detail.map(err => `${err.loc[1]}: ${err.msg}`).join(", ");
+            }
+
+            showToast("Fehler: " + message, "error");
         }  
     } catch (e) {
         showToast("Server nicht erreichbar", "error");
@@ -88,6 +96,16 @@ updateUI();
 /** Hilfsfunktion für Header-Authorization */
 function getAuthHeader() {
     return currentUser ? { "Authorization": `Bearer ${currentUser.token}` } : {};
+}
+
+// Hilfsfunktion zum Markieren
+function markInvalid(element) {
+    element.classList.add("is-invalid");
+
+    // Sobald der Nutzer wieder tippt, die rote Markierung entfernen
+    element.addEventListener("input", () => {
+        element.classList.remove("is-invalid");
+    }, { once: true });
 }
 
 // Delete-Aufruf mit Token
@@ -114,15 +132,28 @@ async function saveProduct() {
     const id = document.getElementById("product-id-hidden")?.value; 
     
     const productData = {
-        name: document.getElementById("name").value,
+        name: document.getElementById("name"),
         short_sign: document.getElementById("short_sign").value,
         material: document.getElementById("material").value,
         norm: document.getElementById("norm").value,
-        length: parseFloat(document.getElementById("length").value) || 0,
-        price: parseFloat(document.getElementById("price").value) || 0,
-        stock: parseInt(document.getElementById("stock").value) || 0,
+        length: document.getElementById("length"),
+        price: document.getElementById("price"),
+        stock: document.getElementById("stock"),
         certificate: "3.1" // Standardwert oder neues Input-Feld
     };
+
+    let isValid = true;
+
+    // Validierungs-Logik
+    if (!productData.name.value) { markInvalid(productData.name); isValid = false; }
+    if (parseFloat(productData.price.value) <= 0 || isNaN(productData.price.value)) { markInvalid(productData.price); isValid = false; }
+    if (parseInt(productData.stock.value) < 0 || isNaN(productData.stock.value)) { markInvalid(productData.stock); isValid = false; }
+    if (parseFloat(productData.length.value) <= 0 || isNaN(productData.length.value)) { markInvalid(productData.length); isValid = false; }
+
+    if (!isValid) {
+        showToast("Bitte markierte Felder korrigieren!", "error");
+        return; // Hier der wichtige Abbruch!
+    }
 
     const method = id ? "PUT" : "POST";
     const url = id ? `${API}/products/${id}` : `${API}/products/`;
@@ -139,7 +170,15 @@ async function saveProduct() {
         loadProducts(); // Liste neu laden
     } else {
         const error = await response.json();
-        showToast("Fehler: " + (error.detail || "Unbekannter Fehler"), "error");
+        let message = "Unbekannter Fehler";
+        if (typeof error.detail === "string") {
+            message = error.detail;
+        } else if (Array.isArray(error.detail)) {
+            // Nimmt die erste Fehlermeldung aus der Liste (z.B. "name: field required")
+            message = error.detail.map(err => `${err.loc[1]}: ${err.msg}`).join(", ");
+        }
+
+        showToast("Fehler: " + message, "error");
     }
 }
 
@@ -274,8 +313,17 @@ function renderCart() {
 async function increaseStock() {
     const productId = document.getElementById("stock-product-select").value;
     const amount = parseInt(document.getElementById("stock-increase").value);
-    
-    if (!productId || isNaN(amount)) return;
+    if (!productId || isNaN(amount)){
+        if(!productId){
+            alert("bitte product auswählen")
+        }
+        if(isNaN(amount)){
+            alert("Lagerstand muss > 0 sein")
+        }
+
+        return;
+    }
+
 
     // Ein Patch/Put Request an das Backend
     await fetch(`${API}/products/${productId}/increase`, {
@@ -315,7 +363,15 @@ async function checkout() {
         loadProducts(); // Lagerzahlen live aktualisieren
     }else {
         const error = await response.json();
-        showToast("Fehler: " + (error.detail || "Unbekannter Fehler"), "error");
+        let message = "Login fehlgeschlagen!";
+        if (typeof error.detail === "string") {
+            message = error.detail;
+        } else if (Array.isArray(error.detail)) {
+            // Nimmt die erste Fehlermeldung aus der Liste (z.B. "name: field required")
+            message = error.detail.map(err => `${err.loc[1]}: ${err.msg}`).join(", ");
+        }
+
+        showToast("Fehler: " + message, "error");
     }
 }
 

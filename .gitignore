@@ -5,3 +5,4 @@ venv/
 .env
 logs/
 hash_check.py
+docker-compose.yml

@@ -2,17 +2,17 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models import Product
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from app.services.logger import log_action
 
 class ProductCreate(BaseModel):
-    name: str
+    name: str = Field(..., min_length=1)
     short_sign: str
     material: str
     norm: str
-    length: float
-    price: float
-    stock: int
+    length: float = Field(..., gt=0)
+    price: float = Field(..., gt=0)
+    stock: int = Field(..., ge=0)
     certificate: str = "3.1"
 
 router = APIRouter(prefix="/products", tags=["Products"])

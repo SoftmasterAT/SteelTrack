@@ -45,16 +45,17 @@ steeltrack/
 Wechsle in den backend Ordner und erstelle eine virtuelle Umgebung:
 ```powershell
 cd backend
-python -m venv venv
+winget install Python.Python.3.12
+python -3.12 -m venv venv
 .\venv\Scripts\activate
-pip install .
+pip install -r requirements.txt
 ```
 
 ### 2. Umgebungsvariablen
 Erstelle eine .env Datei im Hauptverzeichnis mit deinen Passwort-Hashes:
 ```text
-ADMIN_HASH=$2b$12$XFLiJ1t9ehDgUXXO8NErneK0rQrHMUKaC2.tt2as9IHrWIKAjvO6K
-STAFF_HASH=$2b$12$...
+STEELTRACK_ADMIN_HASH=$2b$12$...
+STEELTRACK_STAFF_HASH=$2b$12$...
 ```
 
 

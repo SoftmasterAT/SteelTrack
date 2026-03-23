@@ -4,6 +4,7 @@ from app.database import SessionLocal
 from app.models import Order, Product
 from pydantic import BaseModel
 from app.services.logger import log_action
+from datetime import datetime, timezone
 
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
@@ -73,7 +74,8 @@ async def checkout_card(cart_items: list[dict], db: Session = Depends(get_db)):
             new_order = Order(
                 product_id=item["id"],
                 quantity=item["quantity"],
-                total_price=product.price * item["quantity"]
+                total_price=product.price * item["quantity"],
+                created_at=datetime.now(timezone.utc)
             )
             db.add(new_order)
             results.append({"product_id": item["id"], "status": "bestellt"})

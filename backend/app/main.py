@@ -50,7 +50,7 @@ async def login(data: dict):
     username = data.get("username")
     password = data.get("password")
     # Validierung gegen .env Hashes
-    if username == "admin" and verify_password(password, os.getenv("ADMIN_HASH")):
+    if username == "admin" and verify_password(password, os.getenv("STEELTRACK_ADMIN_HASH")):
         role = "admin"
     elif username == "staff" and verify_password(password, os.getenv("STAFF_HASH")):
         role = "staff"
@@ -86,3 +86,7 @@ def root():
     return {"message": "SteelTrack API läuft 🚀", "status": "online"}
 
 
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

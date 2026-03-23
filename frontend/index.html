@@ -6,6 +6,13 @@
         <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
         <title>SteelTrack Dashboard</title>
         <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            .is-invalid {
+                border-color: #ef4444 !important; /* Tailwind red-500 */
+                outline: 2px solid #ef4444 !important;
+                background-color: #fef2f2 !important; /* Ganz helles Rot */
+            }
+        </style>
     </head>
 
     <body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
@@ -76,7 +83,7 @@
                             <select id="stock-product-select" class="w-full p-2 bg-slate-900 border border-slate-700 rounded">
                                 <!-- Wird dynamisch gefüllt -->
                             </select>
-                            <input id="stock-increase" type="number" placeholder="Menge hinzufügen" class="w-full p-2 bg-slate-900 border border-slate-700 rounded">
+                            <input id="stock-increase" type="number" placeholder="Menge hinzufügen" class="w-full p-2 bg-slate-900 border border-slate-700 rounded" required>
                             <button onclick="checkAuth('staff', increaseStock)" class="w-full bg-green-600 py-2 rounded font-bold flex items-center justify-center gap-2">
                                 <span class="staff-lock-icon">🔒</span> Bestand erhöhen
                             </button>
