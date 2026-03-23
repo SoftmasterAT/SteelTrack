@@ -24,4 +24,4 @@ ENV PYTHONPATH=/app/backend
 EXPOSE 8000
 
 # Starte die App (Port wird von Render übergeben)
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", ${PORT:-8000}]
+CMD ["sh", "-c", "uvicorn api:app --host 0.0.0.0 --port ${PORT:-8000}"]
