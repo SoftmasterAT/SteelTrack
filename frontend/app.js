@@ -1,7 +1,5 @@
-// Erkennt automatisch, ob es lokal oder auf Render läuft
-const API = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" 
-    ? "http://127.0.0.1:8000" 
-    : "https://onrender.com";
+const API = ""; 
+console.log("API URL gesetzt auf: " + (API || "relativer Pfad"));
 
 let cart = [];
 let allProducts = [];

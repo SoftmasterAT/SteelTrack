@@ -12,6 +12,9 @@ RUN pip install ./backend/
 # Gesamten Code kopieren
 COPY . .
 
+RUN cp /app/steeltrack.db /app/backend/steeltrack.db || true
+RUN chmod 666 /app/backend/steeltrack.db || true
+
 # Ordner für Logs und DB explizit erstellen
 RUN mkdir -p /app/backend/logs
 
