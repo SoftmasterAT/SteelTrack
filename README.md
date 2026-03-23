@@ -16,6 +16,9 @@ SteelTrack ist eine moderne Full-Stack-Anwendung zur Verwaltung von Stahlprodukt
 - **Professionelle Dokumentation**: Automatisierte API-Dokumentation via `pdoc`.
 
 
+## Screenshot
+![API Preview](frontend/images/steeltrack_screenshot.png)
+
 
 ## 📂 Projektstruktur
 
