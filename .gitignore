@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+docs/
+venv/
+.env
+logs/
+hash_check.py

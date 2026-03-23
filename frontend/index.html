@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+        <title>SteelTrack Dashboard</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+
+    <body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+        <!-- Login Overlay (wird nur angezeigt wenn nicht eingeloggt) -->
+        <div id="login-modal" class="fixed inset-0 bg-slate-950/90 flex items-center justify-center z-[100] hidden p-4">
+            <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700 w-full max-w-md shadow-2xl relative">
+                <button onclick="closeLogin()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">✕</button>
+                
+                <h2 class="text-2xl font-bold mb-2 text-center">🔐 System-Login</h2>
+                <p id="login-msg" class="text-sm text-slate-400 text-center mb-6 italic">Bitte melden Sie sich an.</p>
+                
+                <div class="space-y-4">
+                    <input id="login-username" type="text" placeholder="Benutzername" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-blue-500">
+                    <input id="login-password" type="password" placeholder="Passwort" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white outline-none focus:border-blue-500">
+                    <button onclick="performLogin()" class="w-full bg-blue-600 py-3 rounded-xl font-bold hover:bg-blue-500 transition-all shadow-lg">Anmelden</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navbar -->
+        <nav class="bg-slate-800 border-b border-slate-700 mb-8 shadow-xl">
+            <div class="container mx-auto px-4 py-2 flex items-center justify-between">
+                <div class="flex items-center">
+                    <img src="static/images/steeltrack_logo.webp" alt="SteelTrack Logo" style="width: 275px; height: 80px; object-fit: contain;">
+                </div>
+                
+                <div class="flex flex-col items-end gap-1">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                        </span>
+                        <span class="text-[10px] font-mono text-green-400 uppercase tracking-widest">System Online</span>
+                    </div>
+                    <!-- Auth Status Area -->
+                    <div id="auth-status" class="text-[11px] flex items-center gap-3 border-t border-slate-700 pt-1 mt-1">
+                        <span id="user-display" class="text-slate-400">👤 Gast-Modus</span>
+                        <button id="logout-btn" onclick="logout()" class="text-red-400 hover:underline hidden">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container mx-auto px-4">
+            <div class="grid lg:grid-cols-12 gap-6">
+                
+                <!-- SPALTE 1: Verwaltung (Admin/Staff) -->
+                <div class="lg:col-span-3 space-y-6">
+                    <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl">
+                        <h2 class="font-bold mb-4 text-blue-400">📦 Produkt-Management</h2>
+                        <div class="space-y-3 text-sm">
+                            <input id="name" placeholder="Name" class="w-full p-2 bg-slate-900 border border-slate-700 rounded">
+                            <input id="short_sign" placeholder="Kurzzeichen (HEB 300)" class="w-full p-2 bg-slate-900 border border-slate-700 rounded">
+                            <input id="material" placeholder="Werkstoff (S235JR)" class="w-full p-2 bg-slate-900 border border-slate-700 rounded">
+                            <input id="norm" placeholder="Norm (EN 10025)" class="w-full p-2 bg-slate-900 border border-slate-700 rounded">
+                            <input id="length" type="number" placeholder="Länge (m)" class="w-full p-2 bg-slate-900 border border-slate-700 rounded">
+                            <input id="price" type="number" placeholder="Preis €" class="w-full p-2 bg-slate-900 border border-slate-700 rounded">
+                            <input id="stock" type="number" placeholder="Startbestand" class="w-full p-2 bg-slate-900 border border-slate-700 rounded">
+                            <button onclick="checkAuth('admin', saveProduct)" class="w-full bg-blue-600 py-2 rounded font-bold flex items-center justify-center gap-2">
+                                <span class="admin-lock-icon">🔒</span> Speichern / Update
+                            </button>
+                        </div>
+                        
+                        <hr class="my-6 border-slate-700">
+                        
+                        <h2 class="font-bold mb-4 text-green-400">📥 Lager auffüllen</h2>
+                        <div class="space-y-3 text-sm">
+                            <select id="stock-product-select" class="w-full p-2 bg-slate-900 border border-slate-700 rounded">
+                                <!-- Wird dynamisch gefüllt -->
+                            </select>
+                            <input id="stock-increase" type="number" placeholder="Menge hinzufügen" class="w-full p-2 bg-slate-900 border border-slate-700 rounded">
+                            <button onclick="checkAuth('staff', increaseStock)" class="w-full bg-green-600 py-2 rounded font-bold flex items-center justify-center gap-2">
+                                <span class="staff-lock-icon">🔒</span> Bestand erhöhen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SPALTE 2: Produkt-Katalog (Scrollbar) -->
+                <div class="lg:col-span-6">
+                    <h2 class="font-bold mb-4 flex items-center gap-2">🏗️ Lagerbestand <span id="product-count" class="text-xs bg-slate-700 px-2 py-1 rounded">0</span></h2>
+                    <div id="products-container" class="space-y-4 overflow-y-auto pr-2" style="max-height: 80vh;">
+                        <!-- Dynamische Produktkarten -->
+                    </div>
+                </div>
+
+                <!-- SPALTE 3: Warenkorb -->
+                <div class="lg:col-span-3">
+                    <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 shadow-xl sticky top-4">
+                        <h2 class="font-bold mb-4 text-orange-400 flex items-center justify-between">
+                            🛒 Warenkorb <span id="cart-count" class="text-xs bg-orange-500/20 text-orange-400 px-2 py-1 rounded">0</span>
+                        </h2>
+                        <div id="cart-items" class="space-y-3 mb-6 text-sm max-height-[40vh] overflow-y-auto">
+                            <!-- Warenkorb Items -->
+                        </div>
+                        <div class="border-t border-slate-700 pt-4">
+                            <div class="flex justify-between font-bold text-lg mb-4">
+                                <span>Gesamt:</span>
+                                <span id="cart-total">€ 0.00</span>
+                            </div>
+                            <button onclick="checkout()" class="w-full bg-orange-600 py-3 rounded-xl font-bold hover:bg-orange-500 transition-colors">Jetzt Bestellen</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+
+        <script src="static/app.js"></script>
+        <!-- Toast Container -->
+        <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    </body>
+</html>

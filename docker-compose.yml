@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  iris:
+    image: intersystems/iris-community:latest
+    container_name: steeltrack-iris
+    ports:
+      - "1972:1972" # SuperServer (für Python Zugriff)
+      - "52773:52773" # Management Portal (Web-Oberfläche)
+    environment:
+      - ISC_DATA_DIRECTORY=/usr/irissys/mgr/user
+    volumes:
+      - ./iris-init:/usr/irissys/mgr/user/init # Hier können wir ObjectScript-Klassen ablegen
