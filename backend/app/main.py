@@ -15,6 +15,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 import os
+from pathlib import Path
 
 # Eigene Module
 from app.routes import products, orders
@@ -64,13 +65,13 @@ async def login(data: dict):
 
 # Absoluter Pfad zum SteelTrack-Hauptverzeichnis
 # (geht zwei Ebenen hoch von backend/app/main.py)
-BASE_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-FRONTEND_PATH = os.path.join(BASE_PATH, "frontend")
+BASE_PATH = Path(__file__).resolve().parent.parent.parent
+FRONTEND_PATH = BASE_PATH / "frontend"
 
 # Statische Dateien (JS, CSS, Bilder) unter /static verfügbar machen
-app.mount("/static", StaticFiles(directory=FRONTEND_PATH), name="static")
+app.mount("/static", StaticFiles(directory=str(FRONTEND_PATH)), name="static")
 
-@app.get("/", tags=["Frontend"])
+@app.get("/")
 async def read_index():
     """
     Serviert die Hauptseite der Anwendung.
@@ -78,7 +79,7 @@ async def read_index():
     Returns:
         FileResponse: Die index.html Datei aus dem Frontend-Ordner.
     """
-    return FileResponse(os.path.join(FRONTEND_PATH, "index.html"))
+    return FileResponse(str(FRONTEND_PATH / "index.html"))
 
 @app.get("/status", tags=["System"])
 def root():
